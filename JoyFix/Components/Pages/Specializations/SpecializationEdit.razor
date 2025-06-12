@@ -1,0 +1,38 @@
+﻿@page "/specializationadd"
+@inject JoyFix.Services.SpecializationService SpecializationService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Add New Specialization</h3>
+
+<EditForm Model="specialization" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <InputText class="form-control" @bind-Value="specialization.Name" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <InputTextArea class="form-control" @bind-Value="specialization.Description" />
+    </div>
+
+    <button class="btn btn-success" type="submit">Save</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick="GoBack">Cancel</button>
+</EditForm>
+
+@code {
+    private JoyFix.Data.Specialization specialization = new();
+
+    private void HandleValidSubmit()
+    {
+        SpecializationService.AddSpecialization(specialization);
+        Navigation.NavigateTo("/specializations");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/specializations");
+    }
+}

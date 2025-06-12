@@ -1,0 +1,62 @@
+﻿@page "/customeradd"
+@inject JoyFix.Services.CustomerService CustomerService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Add new Customer</h3>
+
+<EditForm Model="customer" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <InputText class="form-control" @bind-Value="customer.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <InputText class="form-control" @bind-Value="customer.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Phone number</label>
+        <InputText class="form-control" @bind-Value="customer.PhoneNumber" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Address</label>
+        <InputText class="form-control" @bind-Value="customer.Address" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="Cancel">Cancel</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger mt-3">@error</div>
+}
+
+@code {
+    private JoyFix.Data.Customer customer = new();
+    private string? error;
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+
+    private void HandleValidSubmit()
+    {
+        try
+        {
+            CustomerService.AddCustomer(customer);
+            Navigation.NavigateTo("/customers");
+        }
+        catch (InvalidOperationException ex)
+        {
+            error = ex.Message;
+        }
+    }
+}

@@ -1,0 +1,43 @@
+﻿@page "/databaseswitcher"
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Choose Database</h3>
+
+@if (databases is not null)
+{
+    <select @bind="selectedDatabase" class="form-select">
+        @foreach (var db in databases)
+        {
+            <option value="@db">@db</option>
+        }
+    </select>
+
+    <button class="btn btn-primary mt-2" @onclick="ConfirmChange">Apply</button>
+
+    <p class="mt-3">Current Database: <strong>@selectedDatabase</strong></p>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private string selectedDatabase = DatabaseService.CurrentConnection ?? "DefaultConnection";
+    private List<string> databases = new() { "DefaultConnection", "TestConnection" };
+
+    private void OnDatabaseChanged(ChangeEventArgs e)
+    {
+        selectedDatabase = e.Value?.ToString() ?? "DefaultConnection";
+        DatabaseService.CurrentConnection = selectedDatabase;
+
+        Console.WriteLine($"Wybrano bazę: {selectedDatabase}");
+        StateHasChanged();
+    }
+
+    private void ConfirmChange()
+    {
+        DatabaseService.CurrentConnection = selectedDatabase;
+        Console.WriteLine($"Zmieniono bazę na: {selectedDatabase}");
+    }
+}

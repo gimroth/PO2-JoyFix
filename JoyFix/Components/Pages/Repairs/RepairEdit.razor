@@ -1,0 +1,80 @@
+﻿@page "/repairedit/{Id:int}"
+@inject JoyFix.Services.RepairService RepairService
+@inject JoyFix.Services.TechnicianService TechnicianService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Edit Repair</h3>
+
+@if (repair == null)
+{
+    <p><em>Loading data...</em></p>
+}
+else
+{
+    <EditForm Model="@repair" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Technician</label>
+            <select class="form-select" @bind="repair.TechnicianId">
+                @foreach (var tech in technicians)
+                {
+                    <option value="@tech.Id">@tech.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Work Description</label>
+            <InputTextArea class="form-control" @bind-Value="repair.WorkDescription" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Parts Used</label>
+            <InputTextArea class="form-control" @bind-Value="repair.PartsUsed" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Cost</label>
+            <InputNumber class="form-control" @bind-Value="repair.Cost" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Repair Date</label>
+            <InputDate class="form-control" @bind-Value="repair.RepairDate" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" class="btn btn-secondary ms-2" @onclick="Cancel">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private JoyFix.Data.Repair? repair;
+    private List<JoyFix.Data.Technician> technicians = new();
+
+    protected override void OnInitialized()
+    {
+        repair = RepairService.GetRepairByRequestId(Id);
+        technicians = TechnicianService.GetAllTechnicians();
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (repair != null)
+        {
+            RepairService.UpdateRepair(repair);
+            Navigation.NavigateTo("/repairs");
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/repairs");
+    }
+}

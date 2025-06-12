@@ -1,0 +1,85 @@
+﻿@page "/deviceedit/{Id:int}"
+@inject JoyFix.Services.DeviceService DeviceService
+@inject JoyFix.Services.CustomerService CustomerService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Edit Device</h3>
+
+@if (device == null || customers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="device" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Device Type</label>
+            <InputText class="form-control" @bind-Value="device.DeviceType" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Model</label>
+            <InputText class="form-control" @bind-Value="device.Model" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Serial Number</label>
+            <InputText class="form-control" @bind-Value="device.SerialNumber" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Customer</label>
+            <InputSelect class="form-control" @bind-Value="device.CustomerId">
+                <option value="">-- select customer --</option>
+                @foreach (var c in customers)
+                {
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-primary me-2">Save changes</button>
+        <button class="btn btn-secondary" @onclick="GoBack">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private JoyFix.Data.Device? device;
+    private List<JoyFix.Data.Customer>? customers;
+
+    protected override void OnInitialized()
+    {
+        device = DeviceService.GetDeviceById(Id);
+        customers = CustomerService.GetAllCustomers();
+
+        if (device == null)
+        {
+            Navigation.NavigateTo("/devices");
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        try
+        {
+            DeviceService.UpdateDevice(device!);
+            Navigation.NavigateTo("/devices");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erorr while saving: {ex.Message}");
+        }
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/devices");
+    }
+}

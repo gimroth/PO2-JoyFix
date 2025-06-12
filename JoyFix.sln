@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoyFix", "JoyFix\JoyFix.csproj", "{5848CD18-65FB-406C-A66C-6B3B3C923985}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5848CD18-65FB-406C-A66C-6B3B3C923985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5848CD18-65FB-406C-A66C-6B3B3C923985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5848CD18-65FB-406C-A66C-6B3B3C923985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5848CD18-65FB-406C-A66C-6B3B3C923985}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {96EA5B57-9766-47E0-BE19-9BD8051C3454}
+	EndGlobalSection
+EndGlobal

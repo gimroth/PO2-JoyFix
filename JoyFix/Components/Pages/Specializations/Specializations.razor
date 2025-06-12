@@ -1,0 +1,120 @@
+﻿@page "/specializations"
+@inject JoyFix.Services.SpecializationService SpecializationService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Specializations</h3>
+
+<button class="btn btn-primary mb-3" @onclick="CreateNew">Add Specialization</button>
+
+<div class="card p-3 mb-4">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="filterName" placeholder="Filter by name..." />
+        </div>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="filterDescription" placeholder="Filter by description..." />
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-primary" @onclick="ApplyFilters">Search</button>
+            <button class="btn btn-secondary" @onclick="ClearFilters">Clear</button>
+        </div>
+    </div>
+</div>
+
+@if (filteredSpecializations == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!filteredSpecializations.Any())
+{
+    <p>No specializations matching the criteria.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in filteredSpecializations)
+            {
+                <tr>
+                    <td>@s.Name</td>
+                    <td>@s.Description</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary me-1" @onclick="() => Edit(s.Id)">Edit</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(s.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (confirmDeleteId != null)
+{
+    <div class="alert alert-warning mt-3">
+        <p>Are you sure you want to delete this specialization?</p>
+        <button class="btn btn-danger me-2" @onclick="DeleteConfirmed">Yes, delete</button>
+        <button class="btn btn-secondary" @onclick="() => confirmDeleteId = null">Cancel</button>
+    </div>
+}
+
+@code {
+    private List<JoyFix.Data.Specialization> specializations = new();
+    private List<JoyFix.Data.Specialization> filteredSpecializations = new();
+
+    private string? filterName;
+    private string? filterDescription;
+
+    private int? confirmDeleteId = null;
+
+    protected override void OnInitialized()
+    {
+        LoadSpecializations();
+    }
+
+    private void LoadSpecializations()
+    {
+        specializations = SpecializationService.GetAllSpecializations();
+        filteredSpecializations = new List<JoyFix.Data.Specialization>(specializations);
+    }
+
+    private void ApplyFilters()
+    {
+        filteredSpecializations = specializations
+            .Where(s =>
+                (string.IsNullOrWhiteSpace(filterName) || s.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(filterDescription) || s.Description.Contains(filterDescription, StringComparison.OrdinalIgnoreCase))
+            )
+            .ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filterName = null;
+        filterDescription = null;
+        filteredSpecializations = new List<JoyFix.Data.Specialization>(specializations);
+    }
+
+    private void Edit(int id) => Navigation.NavigateTo($"/specializationedit/{id}");
+
+    private void CreateNew() => Navigation.NavigateTo("/specializationadd");
+
+    private void ConfirmDelete(int id) => confirmDeleteId = id;
+
+    private void DeleteConfirmed()
+    {
+        if (confirmDeleteId != null)
+        {
+            SpecializationService.DeleteSpecialization(confirmDeleteId.Value);
+            confirmDeleteId = null;
+            LoadSpecializations();
+        }
+    }
+}

@@ -1,0 +1,84 @@
+﻿@page "/repairrequestsedit/{Id:int}"
+@inject JoyFix.Services.RepairRequestService RepairRequestService
+@inject JoyFix.Services.CustomerService CustomerService
+@inject JoyFix.Services.DeviceService DeviceService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Edit Repair Request</h3>
+
+@if (request == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="@request" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Customer</label>
+            <select class="form-select" @bind="request.CustomerId">
+                @foreach (var customer in customers)
+                {
+                    <option value="@customer.Id">@customer.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Device</label>
+            <select class="form-select" @bind="request.DeviceId">
+                @foreach (var device in devices)
+                {
+                    <option value="@device.Id">@device.Model</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Device type</label>
+            <input class="form-control" @bind="request.DeviceType" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" @bind="request.Status">
+                <option value="oczekuje">Pending</option>
+                <option value="w realizacji">In Progress</option>
+                <option value="zakończone">Completed</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success">Save</button>
+        <button class="btn btn-secondary ms-2" @onclick="Cancel">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private JoyFix.Data.RepairRequest? request;
+    private List<JoyFix.Data.Customer> customers = new();
+    private List<JoyFix.Data.Device> devices = new();
+
+    protected override void OnInitialized()
+    {
+        request = RepairRequestService.GetRequestById(Id);
+        customers = CustomerService.GetAllCustomers();
+        devices = DeviceService.GetAllDevices();
+    }
+
+    private void HandleValidSubmit()
+    {
+        RepairRequestService.UpdateRequest(request!);
+        Navigation.NavigateTo("/repairrequests");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/repairrequests");
+    }
+}

@@ -1,0 +1,75 @@
+﻿@page "/technicianedit/{id:int}"
+@inject JoyFix.Services.TechnicianService TechnicianService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Edit Technician</h3>
+
+@if (technician == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="technician" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <InputText class="form-control" @bind-Value="technician.Name" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <InputText class="form-control" @bind-Value="technician.Email" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <InputText class="form-control" @bind-Value="technician.PhoneNumber" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button class="btn btn-secondary ms-2" @onclick="Cancel">Cancel</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private JoyFix.Data.Technician? technician;
+    private string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        technician = TechnicianService.GetTechnicianById(id);
+
+        if (technician == null)
+        {
+            errorMessage = "Technician not found.";
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        try
+        {
+            TechnicianService.UpdateTechnician(technician!);
+            Navigation.NavigateTo("/technicians");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/technicians");
+    }
+}
